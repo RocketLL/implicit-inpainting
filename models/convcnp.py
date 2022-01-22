@@ -14,7 +14,7 @@ Implementation based on
 
 
 class Conv2DResBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=5, stride=1, padding=2):
+    def __init__(self, in_channels, out_channels, kernel_size=11, stride=1, padding=2):
         super().__init__()
 
         Conv2d = partial(
@@ -39,19 +39,16 @@ class Conv2DResBlock(nn.Module):
 
 
 class Conv2dCNP(nn.Module):
-    def __init__(self, channels):
+    def __init__(self, dims=3, channels=128, blocks=8):
         super().__init__()
 
-        self.channels = channels
-        self.conv = nn.Conv2d(channels, 128, 9, 1, 4)
+        self.dims = dims
+        self.conv = nn.Conv2d(dims, channels, 9, 1, 4)
 
         self.nn = nn.Sequential(
-            nn.Conv2d(128 + 128, 128, 1, 1, 0),
-            Conv2DResBlock(128, 128),
-            Conv2DResBlock(128, 128),
-            Conv2DResBlock(128, 128),
-            Conv2DResBlock(128, 128),
-            nn.Conv2d(128, 2 * channels, 1, 1, 0),
+            nn.Conv2d(channels + channels, channels, 1, 1, 0),
+            *[Conv2DResBlock(channels, channels) for _ in range(blocks)],
+            nn.Conv2d(channels, 2 * dims, 1, 1, 0),
         )
 
     def forward(self, image, mask):
@@ -60,7 +57,7 @@ class Conv2dCNP(nn.Module):
 
         x = torch.cat((image_prime, mask_prime), 1)
         phi = self.nn(x)
-        mean, std = phi.split(self.channels, 1)
+        mean, std = phi.split(self.dims, 1)
         std = softplus(std)
 
         return MultivariateNormal(mean, scale_tril=std.diag_embed())
