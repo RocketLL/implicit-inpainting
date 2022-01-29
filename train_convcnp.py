@@ -28,7 +28,7 @@ def train(model, dataloader, optimizer, device):
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    weights_path = "weights/convcnp.pth"
+    weights_path = "convcnp.pth"
 
     trainset = CIFAR10("data", "train", download=False, transform=transforms.ToTensor())
     trainloader = DataLoader(trainset, 16, True)

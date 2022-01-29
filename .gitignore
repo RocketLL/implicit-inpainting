@@ -155,4 +155,5 @@ cython_debug/
 data/
 
 # Weights
-weights/
+*.pt
+*.pth
