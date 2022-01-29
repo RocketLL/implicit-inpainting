@@ -37,8 +37,12 @@ if __name__ == "__main__":
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
 
     epochs = 20
-    for i in range(epochs):
-        print(f"epoch {i}")
-        train(model, trainloader, optimizer, device)
+
+    try:
+        for i in range(epochs):
+            print(f"epoch {i}")
+            train(model, trainloader, optimizer, device)
+    except KeyboardInterrupt:
+        pass
 
     torch.save(model.state_dict(), weights_path)
