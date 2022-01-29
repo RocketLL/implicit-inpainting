@@ -1,8 +1,8 @@
 import torch
 from torch import nn
-from torch.nn.functional import relu, softplus
+from torch.nn.functional import softplus
 from torch.distributions import MultivariateNormal
-from functools import partial
+from modules import Conv2DResBlock
 
 """
 Convolutional Conditional Neural Processes,
@@ -11,31 +11,6 @@ Convolutional Conditional Neural Processes,
 Implementation based on
     https://github.com/makora9143/pytorch-convcnp
 """
-
-
-class Conv2DResBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=11, stride=1, padding=2):
-        super().__init__()
-
-        Conv2d = partial(
-            nn.Conv2d,
-            in_channels,
-            out_channels,
-            kernel_size,
-            stride,
-            padding,
-            groups=in_channels,
-        )
-
-        self.conv2ds = nn.Sequential(
-            Conv2d(),
-            nn.ReLU(),
-            Conv2d(),
-            nn.ReLU(),
-        )
-
-    def forward(self, x):
-        return relu(self.conv2ds(x) + x)
 
 
 class Conv2dCNP(nn.Module):
@@ -47,7 +22,10 @@ class Conv2dCNP(nn.Module):
 
         self.nn = nn.Sequential(
             nn.Conv2d(channels + channels, channels, 1, 1, 0),
-            *[Conv2DResBlock(channels, channels) for _ in range(blocks)],
+            *[
+                Conv2DResBlock(channels, channels, kernel_size=5, stride=1, padding=2)
+                for _ in range(blocks)
+            ],
             nn.Conv2d(channels, 2 * dims, 1, 1, 0),
         )
 
