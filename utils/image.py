@@ -16,7 +16,7 @@ def mask_superresolution(image: torch.Tensor, n=2):
     w = image.shape[-2] * n
     h = image.shape[-1] * n
 
-    erased = torch.zeros((*image.shape[0:-2], w, h), dtype=image.dtype)
+    erased = torch.zeros((*image.shape[0:-2], w, h), dtype=image.dtype, device=image.device)
     erased[..., :, ::n, ::n] = image
 
     mask = torch.zeros_like(erased)
