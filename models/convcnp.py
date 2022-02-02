@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn.functional import softplus
-from torch.distributions import MultivariateNormal
+from torch.distributions import Normal
 from modules import Conv2DResBlock
 
 """
@@ -38,4 +38,4 @@ class Conv2dCNP(nn.Module):
         mean, std = phi.split(self.dims, 1)
         std = 0.1 + 0.9 * softplus(std)
         
-        return MultivariateNormal(mean, scale_tril=std.diag_embed())
+        return mean, std

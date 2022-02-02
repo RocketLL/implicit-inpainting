@@ -17,7 +17,7 @@ class Conv2DResBlock(nn.Module):
             groups=in_channels,
         )
 
-        self.res = nn.Sequential(
+        self.block = nn.Sequential(
             Conv2d(),
             nn.BatchNorm2d(in_channels),
             nn.ReLU(),
@@ -26,4 +26,5 @@ class Conv2DResBlock(nn.Module):
         )
 
     def forward(self, x):
-        return relu(self.res(x) + x)
+        res = x
+        return relu(self.block(x) + res)
