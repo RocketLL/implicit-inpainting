@@ -16,7 +16,9 @@ def mask_superresolution(image: torch.Tensor, n=2):
     w = image.shape[-2] * n
     h = image.shape[-1] * n
 
-    erased = torch.zeros((*image.shape[0:-2], w, h), dtype=image.dtype, device=image.device)
+    erased = torch.zeros(
+        (*image.shape[0:-2], w, h), dtype=image.dtype, device=image.device
+    )
     erased[..., :, ::n, ::n] = image
 
     mask = torch.zeros_like(erased)
@@ -26,9 +28,9 @@ def mask_superresolution(image: torch.Tensor, n=2):
 
 
 def mask_random(image: torch.Tensor, p=0.5):
-    mask = torch.zeros_like(image)
+    mask = torch.zeros(image.shape[-3:])
 
-    mask[..., 0, :, :].bernoulli_(p)
-    mask[..., :, :, :] = mask[..., 0, :, :].unsqueeze(-3)
+    mask[0, :, :].bernoulli_(p)
+    mask[:, :, :] = mask[0, :, :].unsqueeze(-3)
 
-    return image * mask, mask
+    return image * mask, mask.broadcast_to(image.shape)
