@@ -28,7 +28,7 @@ def mask_superresolution(image: torch.Tensor, n=2):
 
 
 def mask_random(image: torch.Tensor, p=0.5):
-    mask = torch.zeros(image.shape[-3:])
+    mask = torch.zeros(image.shape[-3:]).to(image.device)
 
     mask[0, :, :].bernoulli_(p)
     mask[:, :, :] = mask[0, :, :].unsqueeze(-3)
